@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const usuariosController = require('../controllers/usuarios.controllers');
+const { postUsuario, getUsuarios, upload } = require('../controllers/usuarios.controllers');
 
-router.post('/usuarios', usuariosController.postUsuario);
+// Rotas
+router.post('/usuarios', upload.single('image'), postUsuario);  // Middleware de upload de imagem
+router.get('/usuarios', getUsuarios);
 
 module.exports = router;
