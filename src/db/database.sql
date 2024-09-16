@@ -34,15 +34,15 @@ CREATE TABLE usuarios (
     telefone VARCHAR(255),
     email VARCHAR(255),
     adm BOOLEAN,
-    salas VARCHAR(255) REFERENCES salas(id),
-    sala_fixa VARCHAR(255) REFERENCES salas(id)
+    ambientes VARCHAR(255) REFERENCES ambientes(id),
+    sala_fixa VARCHAR(255) REFERENCES ambientes(id)
 );
 
 -- Criação de tabela chaves ( requesito )
 CREATE TABLE chaves (
     id INT PRIMARY KEY,
     disponivel BOOLEAN,
-    salas VARCHAR(255) REFERENCES salas(id)
+    salas VARCHAR(255) REFERENCES ambientes(id)
 );
 
 -- Criação da tabela historico
