@@ -6,6 +6,12 @@ CREATE DATABASE backendsync;
 
 -- Criação das tabelas necessarias
 
+-- Criação da tabela categorias ( tipo de produto )
+CREATE TABLE categorias (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255)
+)
+
 -- Criação da tabela ambientes ( produto )
 CREATE TABLE ambientes (
     id VARCHAR(255) PRIMARY KEY,
@@ -20,7 +26,7 @@ CREATE TABLE ambientes (
     projetor BOOLEAN,
     chave_eletronica BOOLEAN,
     maquinas INT,
-    categoria VARCHAR(255)
+    categoria VARCHAR(255) REFERENCES categorias(id)
 );
 
 -- Criação de tabela usuarios ( clientes )
@@ -33,10 +39,15 @@ CREATE TABLE usuarios (
     notiwhere VARCHAR(100),
     telefone VARCHAR(255),
     email VARCHAR(255),
-    adm BOOLEAN,
-    ambientes VARCHAR(255) REFERENCES ambientes(id),
-    sala_fixa VARCHAR(255) REFERENCES ambientes(id)
+    adm BOOLEAN
 );
+
+-- Criação de tabela salas_fixas
+CREATE TABLE salas_fixas (
+    id SERIAL PRIMARY KEY,
+    ambiente_id VARCHAR(255) REFERENCES ambientes(id),
+    usuario_id VARCHAR(255) REFERENCES usuarios(nif)
+)
 
 -- Criação de tabela chaves ( requesito )
 CREATE TABLE chaves (
