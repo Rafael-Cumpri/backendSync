@@ -31,10 +31,10 @@ async function postUsuario(req, res) {
 
     // Adiciona o usuário ao banco de dados
     const query = `
-        INSERT INTO usuarios (nif, nome, caminho_imagem, descriptor, notificacao, notiwhere, telefone, email, adm, ambientes, sala_fixa)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        INSERT INTO usuarios (nif, nome, caminho_imagem, descriptor, notificacao, notiwhere, telefone, email, adm)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
-    const values = [nif, nome, imagePath, descriptor, notificacao, notiwhere, telefone, email, adm, salas || null, sala_fixa || null];
+    const values = [nif, nome, imagePath, descriptor, notificacao, notiwhere, telefone, email, adm];
 
     try {
         await pool.query(query, values);
