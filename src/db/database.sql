@@ -47,7 +47,7 @@ CREATE TABLE salas_fixas (
     id SERIAL PRIMARY KEY,
     ambiente_id VARCHAR(255) REFERENCES ambientes(id),
     usuario_id VARCHAR(255) REFERENCES usuarios(nif)
-)
+);
 
 -- Criação de tabela chaves ( requesito )
 CREATE TABLE chaves (
