@@ -7,12 +7,12 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
 async function postUsuario(req, res) {
-    const { nif, nome, descriptor, notificacao, notiwhere, telefone, email, adm, salas, sala_fixa } = req.body;
+    const { nif, nome, descriptor, notificacao, notiwhere, telefone, email, adm } = req.body;
     const image = req.file;
 
     // Verifica se a imagem foi enviada
     if (!image) {
-        return res.status(400).json({ message: 'Imagem não enviada' });
+        return res.status(400).json({ message: image, nif, nome, descriptor, notificacao, notiwhere, telefone, email, adm });
     }
 
     // Cria o diretório para armazenar a imagem, se não existir
