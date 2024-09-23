@@ -61,6 +61,7 @@ CREATE TABLE historico (
     id SERIAL PRIMARY KEY,
     data_inicio DATE,
     data_fim DATE,
+    deleted BOOLEAN,
     funcionario VARCHAR(255) REFERENCES usuarios(nif),
     ambiente VARCHAR(255) REFERENCES ambientes(id)
 );
