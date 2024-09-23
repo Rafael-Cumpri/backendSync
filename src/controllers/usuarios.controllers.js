@@ -56,5 +56,32 @@ async function getUsuarios(req, res) {
         res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
     }
 }
+  
+//delete usuarios
+async function deleteUsuario (req, res) {
+    try {
+        const { nif } = req.params;
+        await pool.query('DELETE FROM usuarios WHERE nif = $1', [nif]);
+        res.status(200).send({ mensagem: 'usuário deletado' });
+    } catch (error) {
+        console.error('erro ao excluir usuário', error);
+        res.status(500).send('erro ao excluir usuário');
+    }
+};
+//editar usuarios
+async function editUsuarios(req, res) {
+    try {
+        const { nif } = req.params;
+        const { nome, descriptor, notificacao, notiwhere, telefone, email, adm } = req.body;
 
-module.exports = { postUsuario, getUsuarios, upload };
+
+       
+            await pool.query('UPDATE usuarios SET nome = $1, descriptor = $2, notificacao = $3, notiwhere = $4, telefone = $5, email = $6, adm = $7 WHERE nif = $8', [nome, descriptor, notificacao, notiwhere, telefone, email, adm, nif]);
+            res.status(200).send({ mensagem: ' usuario atualizado' });
+        
+    } catch (error) {
+        console.error('erro ao atualizar usuario', error);
+        res.status(500).send('erro ao atualizar usuario');
+    }
+}
+module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios };
