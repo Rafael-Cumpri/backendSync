@@ -2,7 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors'); 
 const usuariosRoute = require('./routes/usuarios.routes');
+
 const categoriasRoute = require('./routes/categorias.routes');
+const salasFixasRoute = require('./routes/salasFixas.routes')
+const historicoRoute = require('./routes/historico.routes')
+const chavesRoute = require('./routes/chaves.routes')
 
 const app = express();
 const port = process.env.PORT || 3003;
@@ -20,6 +24,9 @@ app.use((req, res, next)=>{
 
 app.use('/', usuariosRoute);
 app.use('/', categoriasRoute);
+app.use('/', salasFixasRoute)
+app.use('/', historicoRoute)
+app.use('/', chavesRoute)
 
 app.listen(port, () => {
     console.log(`App listening on  http://localhost:${port}`);

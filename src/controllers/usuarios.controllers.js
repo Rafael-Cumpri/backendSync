@@ -73,9 +73,6 @@ async function editUsuarios(req, res) {
     try {
         const { nif } = req.params;
         const { nome, descriptor, notificacao, notiwhere, telefone, email, adm } = req.body;
-
-
-       
             await pool.query('UPDATE usuarios SET nome = $1, descriptor = $2, notificacao = $3, notiwhere = $4, telefone = $5, email = $6, adm = $7 WHERE nif = $8', [nome, descriptor, notificacao, notiwhere, telefone, email, adm, nif]);
             res.status(200).send({ mensagem: ' usuario atualizado' });
         
