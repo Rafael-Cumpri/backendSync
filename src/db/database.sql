@@ -46,7 +46,7 @@ CREATE TABLE usuarios (
 -- Criação de tabela salas_fixas
 CREATE TABLE salas_fixas (
     id SERIAL PRIMARY KEY,
-    ambiente_id VARCHAR(255) REFERENCES ambientes(id),
+    ambiente_id INT REFERENCES ambientes(id),
     usuario_id VARCHAR(255) REFERENCES usuarios(nif)
 );
 
@@ -54,7 +54,7 @@ CREATE TABLE salas_fixas (
 CREATE TABLE chaves (
     id INT PRIMARY KEY,
     disponivel BOOLEAN,
-    salas VARCHAR(255) REFERENCES ambientes(id)
+    salas INT REFERENCES ambientes(id)
 );
 
 -- Criação da tabela historico
@@ -64,5 +64,5 @@ CREATE TABLE historico (
     data_fim DATE,
     deleted BOOLEAN,
     funcionario VARCHAR(255) REFERENCES usuarios(nif),
-    ambiente VARCHAR(255) REFERENCES ambientes(id)
+    ambiente INT REFERENCES ambientes(id)
 );

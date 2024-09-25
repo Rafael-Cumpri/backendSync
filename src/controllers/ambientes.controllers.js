@@ -8,20 +8,6 @@ const upload = multer({ dest: 'uploads/' });
 
 async function postAmbientes(req, res) {
     const { nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, categoria } = req.body;
-    const image = req.file;
-
-    // Verifica se o campo nome está presente
-    if (!nome) {
-        return res.status(400).json({ message: 'O campo nome é obrigatório.' });
-    }
-
-    // Verifica se a imagem foi enviada
-    if (!caminho_imagem) {
-        return res.status(400).json({ 
-            message: 'O caminho da imagem é obrigatório.',
-            dados: { nome, numero_ambiente, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, categoria }
-        });
-    }
 
     /*     // Cria o diretório para armazenar a imagem, se não existir
     const directory = path.join(__dirname, '..', '..', 'uploads', numero_ambiente);
