@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors'); 
 const usuariosRoute = require('./routes/usuarios.routes');
 const salasFixasRoute = require('./routes/salasFixas.routes')
+const historicoRoute = require('./routes/historico.routes')
 const app = express();
 const port = process.env.PORT || 3003;
 
@@ -19,6 +20,7 @@ app.use((req, res, next)=>{
 
 app.use('/', usuariosRoute);
 app.use('/', salasFixasRoute)
+app.use('/', historicoRoute)
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
     });
