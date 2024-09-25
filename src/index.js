@@ -7,6 +7,7 @@ const categoriasRoute = require('./routes/categorias.routes');
 const salasFixasRoute = require('./routes/salasFixas.routes')
 const historicoRoute = require('./routes/historico.routes')
 const chavesRoute = require('./routes/chaves.routes')
+const ambientesRoute = require('./routes/ambientes.routes')
 
 const app = express();
 const port = process.env.PORT || 3003;
@@ -24,9 +25,10 @@ app.use((req, res, next)=>{
 
 app.use('/', usuariosRoute);
 app.use('/', categoriasRoute);
-app.use('/', salasFixasRoute)
-app.use('/', historicoRoute)
-app.use('/', chavesRoute)
+app.use('/', salasFixasRoute);
+app.use('/', historicoRoute);
+app.use('/', chavesRoute);
+app.use('/', ambientesRoute);
 
 app.listen(port, () => {
     console.log(`App listening on  http://localhost:${port}`);
