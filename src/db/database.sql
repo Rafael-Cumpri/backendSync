@@ -27,6 +27,7 @@ CREATE TABLE ambientes (
     projetor BOOLEAN,
     chave_eletronica BOOLEAN,
     maquinas INT,
+    disponivel BOOLEAN,
     categoria INT REFERENCES categorias(id)
 );
 
