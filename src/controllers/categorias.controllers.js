@@ -6,7 +6,9 @@ const path = require('path');
 async function postCategorias(req, res) {
     const {nome} = req.body;
    
-
+    if (nome.length() < 3) {
+        res.status(500).jaon({ message: 'categoria com nome muito pequeno' });
+    }
 
     // Adiciona o usuário ao banco de dados
     const query = `
