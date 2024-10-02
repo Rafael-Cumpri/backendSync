@@ -24,7 +24,7 @@ async function postUsuario(req, res) {
     }
 
     // Cria o diretório para armazenar a imagem, se não existir
-    const directory = path.join(__dirname, '..', '..', 'uploads', nome);
+    const directory = path.join(__dirname, '..', '..', 'uploads', 'funcionarios', nome);
     if (!fs.existsSync(directory)) {
         fs.mkdirSync(directory, { recursive: true });
     }

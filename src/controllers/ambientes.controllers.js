@@ -7,10 +7,16 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
 async function postAmbientes(req, res) {
-    const { nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria } = req.body;
+    const { nome, numero_ambiente, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria } = req.body;
+    const image = req.file;
 
-    /*     // Cria o diretório para armazenar a imagem, se não existir
-    const directory = path.join(__dirname, '..', '..', 'uploads', numero_ambiente);
+    // Verifica se a imagem foi enviada
+    if (!image) {
+        return res.status(400).json({ message: image, nif, nome, descriptor, notificacao, notiwhere, telefone, email, adm });
+    }
+
+    // Cria o diretório para armazenar a imagem, se não existir
+    const directory = path.join(__dirname, '..', '..', 'uploads', 'ambientes', nome);
     if (!fs.existsSync(directory)) {
         fs.mkdirSync(directory, { recursive: true });
     }
@@ -21,7 +27,7 @@ async function postAmbientes(req, res) {
         fs.renameSync(image.path, imagePath);  // Move o arquivo temporário
     } catch (err) {
         return res.status(500).json({ message: 'Erro ao mover a imagem', error: err.message });
-    } */
+    }
 
     if(nome.length() < 3) {
         res.status(401).json({message : ' O nome do ambiente precisa ter mais que 3 letras.'});
