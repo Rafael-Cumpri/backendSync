@@ -7,7 +7,7 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
 async function postAmbientes(req, res) {
-    const { nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, categoria } = req.body;
+    const { nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria } = req.body;
 
     /*     // Cria o diretório para armazenar a imagem, se não existir
     const directory = path.join(__dirname, '..', '..', 'uploads', numero_ambiente);
@@ -23,12 +23,20 @@ async function postAmbientes(req, res) {
         return res.status(500).json({ message: 'Erro ao mover a imagem', error: err.message });
     } */
 
+    if(nome.length() < 3) {
+        res.status(401).json({message : ' O nome do ambiente precisa ter mais que 3 letras.'});
+    }
+
+    if(!tipodoambiente) {
+        res.status(401).json({message : ' O ambiente precisa ter um tipo.'});
+    }
+
     // Adiciona o ambiente ao banco de dados
     const query = `
-        INSERT INTO ambientes (nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, categoria)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        INSERT INTO ambientes (nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
     `;
-    const values = [nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, categoria];
+    const values = [nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria];
 
     try {
         await pool.query(query, values);
@@ -69,7 +77,7 @@ async function deleteAmbientes(req, res) {
 async function editAmbientes(req, res) {
     try {
         const { id } = req.params;
-        const { nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, categoria } = req.body;
+        const { nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria } = req.body;
         
         const query = `
             UPDATE ambientes 
@@ -84,12 +92,13 @@ async function editAmbientes(req, res) {
                 wifi = $9, 
                 projetor = $10, 
                 chave_eletronica = $11, 
-                maquinas = $12, 
-                categoria = $13
-            WHERE id = $14
+                maquinas = $12,
+                disponivel = $13 
+                categoria = $14
+            WHERE id = $15
         `;
 
-        const values = [nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, categoria, id];
+        const values = [nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria, id];
 
         await pool.query(query, values);
         res.status(200).send({ mensagem: 'Ambiente atualizado com sucesso' });

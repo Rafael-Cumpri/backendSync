@@ -6,6 +6,10 @@ async function postNewKey(req, res) {
     const query = `INSERT INTO chaves (id, disponivel, salas) VALUES ($1, $2, $3)`;
     const values = [id, disponivel, salas];
 
+    if(!disponivel) {
+        res.status(401).json({message : 'Chave já registrada com alguém'});
+    }
+
     try {
         await pool.query(query, values);
         res.status(200).json({ message: 'Chave anexada com sucesso' });

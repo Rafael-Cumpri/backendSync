@@ -10,6 +10,14 @@ async function postUsuario(req, res) {
     const { nif, nome, descriptor, notificacao, notiwhere, telefone, email, adm } = req.body;
     const image = req.file;
 
+    if(!nif) {
+        res.status(401).json({message : 'O NIF precisa ser um valor real e valido!'});
+    }
+
+    if(!descriptor) {
+        res.status(401).json({message : 'Usuario sem descrição facial, mande outra imagem!'});
+    }
+
     // Verifica se a imagem foi enviada
     if (!image) {
         return res.status(400).json({ message: image, nif, nome, descriptor, notificacao, notiwhere, telefone, email, adm });
