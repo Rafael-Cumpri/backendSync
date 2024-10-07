@@ -55,7 +55,7 @@ CREATE TABLE salas_fixas (
 CREATE TABLE chaves (
     id INT PRIMARY KEY,
     disponivel BOOLEAN,
-    salas INT REFERENCES ambientes(id)
+    salas INT REFERENCES ambientes(numero_ambiente)
 );
 
 -- Criação da tabela historico

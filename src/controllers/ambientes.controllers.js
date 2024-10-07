@@ -10,9 +10,11 @@ async function postAmbientes(req, res) {
     const { nome, numero_ambiente, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria } = req.body;
     const image = req.file;
 
+    console.log(nome, numero_ambiente, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria)
+
     // Verifica se a imagem foi enviada
     if (!image) {
-        return res.status(400).json({ message: image, nif, nome, descriptor, notificacao, notiwhere, telefone, email, adm });
+        return res.status(400).json({ message: nome, numero_ambiente, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria });
     }
 
     // Cria o diretório para armazenar a imagem, se não existir
@@ -29,7 +31,7 @@ async function postAmbientes(req, res) {
         return res.status(500).json({ message: 'Erro ao mover a imagem', error: err.message });
     }
 
-    if(nome.length() < 3) {
+    if(nome.length < 3) {
         res.status(401).json({message : ' O nome do ambiente precisa ter mais que 3 letras.'});
     }
 
@@ -42,7 +44,7 @@ async function postAmbientes(req, res) {
         INSERT INTO ambientes (nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
     `;
-    const values = [nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria];
+    const values = [nome, numero_ambiente, imagePath, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria];
 
     try {
         await pool.query(query, values);
@@ -116,4 +118,4 @@ async function editAmbientes(req, res) {
 
 
 
-module.exports = { postAmbientes, getAmbientes, deleteAmbientes, editAmbientes };
+module.exports = { postAmbientes, getAmbientes, deleteAmbientes, editAmbientes, upload };
