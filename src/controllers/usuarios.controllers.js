@@ -64,6 +64,18 @@ async function getUsuarios(req, res) {
         res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
     }
 }
+async function getUsuariosByNif(req, res) {
+  
+
+    try {
+        const { nif } = req.params;
+        const result = await pool.query('SELECT * FROM usuarios WHERE nif = $1', [nif]);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+    }
+}
   
 //delete usuarios
 async function deleteUsuario (req, res) {
@@ -89,4 +101,4 @@ async function editUsuarios(req, res) {
         res.status(500).send('erro ao atualizar usuario');
     }
 }
-module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios };
+module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuariosByNif };
