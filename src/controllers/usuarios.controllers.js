@@ -37,12 +37,14 @@ async function postUsuario(req, res) {
         return res.status(500).json({ message: 'Erro ao mover a imagem', error: err.message });
     }
 
+    imageURL = `/uploads/funcionarios/${encodeURIComponent(nome)}/${image.originalname}` 
+
     // Adiciona o usuário ao banco de dados
     const query = `
         INSERT INTO usuarios (nif, nome, caminho_imagem, descriptor, notificacao, notiwhere, telefone, email, adm)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
-    const values = [nif, nome, imagePath, descriptor, notificacao, notiwhere, telefone, email, adm];
+    const values = [nif, nome, imageURL, descriptor, notificacao, notiwhere, telefone, email, adm];
 
     try {
         await pool.query(query, values);

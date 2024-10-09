@@ -8,6 +8,7 @@ const salasFixasRoute = require('./routes/salasFixas.routes')
 const historicoRoute = require('./routes/historico.routes')
 const chavesRoute = require('./routes/chaves.routes')
 const ambientesRoute = require('./routes/ambientes.routes')
+const path = require('path')
 
 const app = express();
 const port = process.env.PORT || 3003;
@@ -22,6 +23,11 @@ app.use((req, res, next)=>{
     app.use(cors());
     next();
 });
+
+app.use('/uploads', (req, res, next) => {
+    console.log(`acessando ${req.path}`);
+    next();
+}, express.static(path.join(__dirname, '..', 'uploads')));
 
 app.use('/', usuariosRoute);
 app.use('/', categoriasRoute);

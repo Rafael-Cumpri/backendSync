@@ -39,12 +39,14 @@ async function postAmbientes(req, res) {
         res.status(401).json({message : ' O ambiente precisa ter um tipo.'});
     }
 
+    imageURL = `/uploads/ambientes/${encodeURIComponent(nome)}/${image.originalname}` 
+
     // Adiciona o ambiente ao banco de dados
     const query = `
         INSERT INTO ambientes (nome, numero_ambiente, caminho_imagem, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
     `;
-    const values = [nome, numero_ambiente, imagePath, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria];
+    const values = [nome, numero_ambiente, imageURL, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria];
 
     try {
         await pool.query(query, values);
