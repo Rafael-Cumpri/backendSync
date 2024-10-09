@@ -103,4 +103,30 @@ async function editUsuarios(req, res) {
         res.status(500).send('erro ao atualizar usuario');
     }
 }
-module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuariosByNif };
+
+async function userLogin(req, res) {
+    const {email, nif} = req.body;
+
+    if (!email || !nif) {
+        res.status(401).json({message : 'O email e o nif precisam ser preenchidos!'});
+    }
+
+    const query = 'SELECT * FROM usuarios WHERE email = $1 AND nif = $2';
+    
+    try {
+        const result = await pool.query(query, [email, nif]);
+        if (result.rows.length === 0) {
+            res.status(401).json({message : 'Usuario não encontrado!'});
+        } else {
+            if(result.rows[0].email === email && result.rows[0].nif === nif) {
+                res.status(200).json(result.rows);
+            } else {
+                res.status(401).json({message : 'Usuario não encontrado!'});
+            }
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+    }
+}
+module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuariosByNif, userLogin };
