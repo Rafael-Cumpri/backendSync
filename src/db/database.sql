@@ -16,7 +16,7 @@ CREATE TABLE categorias (
 CREATE TABLE ambientes (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
-    numero_ambiente INT,
+    numero_ambiente INT UNIQUE,
     caminho_imagem TEXT,
     chave BOOLEAN,
     capacidadeAlunos INT NOT NULL,
