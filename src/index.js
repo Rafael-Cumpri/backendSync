@@ -1,4 +1,5 @@
 require('dotenv').config();
+require("./whatsapp/whatsapp");
 const express = require('express');
 const cors = require('cors'); 
 const usuariosRoute = require('./routes/usuarios.routes');
