@@ -21,7 +21,7 @@ async function getSemanal() {
     try {
         console.log('Executando consulta getSemanal...');
         const query = `
-           SELECT h.*, u.* FROM historicos h JOIN usuarios u ON h.usuario_nif = u.id WHERE h.data_fim IS NULL;
+           SELECT h.*, u.* FROM historico h JOIN usuarios u ON h.funcionario = u.nif WHERE h.data_fim IS NULL;
         `;
 
         const response = await pool.query(query);
