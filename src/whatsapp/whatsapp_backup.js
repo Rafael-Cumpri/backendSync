@@ -32,5 +32,42 @@ export async function sendMessage(groupName, message) {
 }
 
 export const startCronJob = (groupName, message) => {
-    const job = new CronJob()
+    const job = new CronJob(
+        "* * * * * *",
+        async function () {
+            await sendMessage(groupName, message);
+        },
+        null, //onComplete
+        true, //start imediatamente
+        "America/Sao_Paulo" //timezone
+
+    );
+    job.start();
 }
+
+client.on("qr", (qr)=> {
+    qrcode.generate(qr, {small: true})
+});
+
+client.on("ready", async()=>{
+    console.log("\nwhatsapp esta pronto\n");
+    console.log("grupos disponiveis");
+
+    try{
+        const chats = await client.getChats();
+        chats.forEach((chat)=>{
+            if(chat.isGroup){
+                console.log(`${chat.name}, ID: ${chat.id._serialized}`);
+            }
+        })
+    } catch(err){
+        console.error("erro ao obter chats", err)
+    }
+
+    const groupName = "Sync";
+    const message= "messagem TESTE no grupo para projeto tcc";
+
+    startCronJob(groupName, message)
+});
+
+client.initialize();
