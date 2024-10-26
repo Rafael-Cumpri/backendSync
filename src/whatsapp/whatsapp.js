@@ -1,55 +1,55 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-const { CronJob } =  require('cron');
-
+const cron = require('node-cron'); // Certifique-se de que esta linha está incluída
 
 const app = express();
-const PORT = 3000; // Porta do seu backend
+const PORT = 3001; // Porta do seu backend
 
 app.use(bodyParser.json());
 
-// Endpoint para enviar mensagens
+// Enviar mensagem
 app.post('/send-message', async (req, res) => {
-  const { phone, message } = req.body;
+    const { phone, message } = req.body;
 
-  try {
-    const response = await axios.post('http://localhost:3000/api/sendText', {
-      chatId: `${phone}@c.us`,
-      text: message,
-      session: 'default', // ou o nome da sua sessão
-    });
+    try {
+        const response = await axios.post('http://localhost:3000/api/sendText', {
+            chatId: `${phone}@c.us`,
+            text: message,
+            session: 'default', // ou o nome da sua sessão
+        });
 
-    res.status(200).json(response.data);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to send message' });
-  }
+        res.status(200).json(response.data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Falha ao enviar mensagem' });
+    }
 });
 
-// agendar a msg 
-const job = new CronJob(
-  '04 15 * * 1-5',
-  async function() {
-    const phone= '5519991263454';
-    const message = 'DEVOLVE A CHAVE AGORA';
+// Lista de destinatários
+const recipients = [
+    '5519983112990',
+    '5519998507379'
+];
 
-    try{
-      await axios.post('http://localhost:3000/api/sendText',{
-        chatId: `${phone}@c.us`,
-        text: message,
-        session: 'default',
-      })
-      console.log(`msg para ${phone} : ${message}`);
-    }catch (error){
-      console.error('erro ao enviar msg', error)
+// Agendar a mensagem
+cron.schedule('58 21 * * 1-5', async () => { 
+    const message = 'é para essa mensagem chegar 21h58';
+    for (const phone of recipients) {
+        try {
+            await axios.post('http://localhost:3000/api/sendText', {
+                chatId: `${phone}@c.us`,
+                text: message,
+                session: 'default',
+            });
+            console.log(`Mensagem enviada para ${phone}: ${message}`);
+        } catch (error) {
+            console.error(`Erro ao enviar mensagem para ${phone}:`, error);
+        }
     }
-    
-  },
-  null,
-   true,
-  'America/Sao_Paulo'
-)
+});
+
+// Iniciar o servidor
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:3000`);
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

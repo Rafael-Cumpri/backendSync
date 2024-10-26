@@ -1,4 +1,3 @@
-//const { response } = require('express');
 const express = require('express');
 const cron = require('node-cron');
 
