@@ -29,7 +29,6 @@ app.post('/send-message', async (req, res) => {
 // Lista de destinatários
 const recipients = [
     '5519983112990',
-    '5519998507379'
 ];
 
 // Agendar a mensagem
