@@ -16,7 +16,7 @@ app.post('/send-message', async (req, res) => {
         const response = await axios.post('http://localhost:3000/api/sendText', {
             chatId: `${phone}@c.us`,
             text: message,
-            session: 'default', // ou o nome da sua sessão
+            session: 'default', 
         });
 
         res.status(200).json(response.data);

@@ -5,7 +5,24 @@ const app = express();
 
 //nodemailer é uma biblioteca para envio de email
 const nodemailer = require('nodemailer');
+const { get } = require('../routes/usuarios.routes');
 
+async function pegarEmail(req, res) {
+    const nif = req.params.nif; // Assuming nif is passed as a URL parameter
+    const query = 'SELECT email FROM usuarios WHERE nif = $1';
+    try {
+        const resultado = await db.query(query, [nif]);
+        if (resultado.rows.length == 0) {
+            return res.status(404).json({ message: 'Usuário não encontrado' });
+        }
+        const email = resultado.rows[0].email;
+        return email;
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+    }
+} 
 // Configuração do transporte de email
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -44,11 +61,6 @@ const transporter = nodemailer.createTransport({
         pass: 'aqiw fhpg blcd rodj'
     }
 });
-
-// Lista de destinatários
-const recipients = [
-    'isabela.souza7@aluno.senai.br',
-];
 
 // Enviar email
 
