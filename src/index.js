@@ -1,9 +1,10 @@
 require('dotenv').config();
-require("./whatsapp/whatsapp");
+
+require("./whatsapp/whatsapp.js");
 const express = require('express');
 const cors = require('cors'); 
 const usuariosRoute = require('./routes/usuarios.routes');
-
+/* const emailRoutes = require('./routes/email.routes.js'); */
 const categoriasRoute = require('./routes/categorias.routes');
 const salasFixasRoute = require('./routes/salasFixas.routes')
 const historicoRoute = require('./routes/historico.routes')
@@ -36,7 +37,7 @@ app.use('/', salasFixasRoute);
 app.use('/', historicoRoute);
 app.use('/', chavesRoute);
 app.use('/', ambientesRoute);
-
+/* app.use('/send', emailRoutes); */
 app.listen(port, () => {
     console.log(`App listening on  http://localhost:${port}`);
     });
