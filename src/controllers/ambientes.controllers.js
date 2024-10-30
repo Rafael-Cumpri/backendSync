@@ -74,8 +74,12 @@ async function getAmbientes(req, res) {
 async function deleteAmbientes(req, res) {
     try {
         const { id } = req.params;
-        await pool.query('DELETE FROM ambientes WHERE id = $1', [id]);  // Corrigido para "ambientes"
-        res.status(200).send({ mensagem: 'Ambiente deletado' });
+        const result = await pool.query('SELECT * FROM ambientes WHERE numero_ambiente = $1', [id])  // Corrigido para "ambientes"
+        if (result.rows[0].chave === true) {
+            await pool.query('DELETE FROM chaves WHERE salas = $1', [id]);
+        }
+        await pool.query('DELETE FROM ambientes WHERE numero_ambiente = $1', [id]);
+        res.status(200).send({ mensagem: 'Ambiente deletado' });      
     } catch (error) {
         console.error('Erro ao excluir ambiente', error);
         res.status(500).send('Erro ao excluir ambiente');
