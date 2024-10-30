@@ -11,8 +11,8 @@ async function newPromiseClass(req, res) {
 
     try {
         await pool.query(query, values);
-        await pool.query('UPDATE ambientes SET disponivel = false WHERE id = $1', [ambiente]);
-        const responseAmbiente = await pool.query('SELECT * FROM ambientes WHERE id = $1', [ambiente]);
+        await pool.query('UPDATE ambientes SET disponivel = false WHERE numero_ambiente = $1', [ambiente]);
+        const responseAmbiente = await pool.query('SELECT * FROM ambientes WHERE numero_ambiente = $1', [ambiente]);
         if(responseAmbiente.rows[0].chave === true) {
             await pool.query('UPDATE chaves SET disponivel = false WHERE salas = $1', [ambiente]);
         }
