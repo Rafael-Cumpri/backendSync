@@ -1,28 +1,25 @@
 const express = require('express');
 const cron = require('node-cron');
-
+const db = require('../config/dbconfig');
 const app = express();
 
 //nodemailer é uma biblioteca para envio de email
 const nodemailer = require('nodemailer');
-const { get } = require('../routes/usuarios.routes');
 
-async function pegarEmail(req, res) {
-    const nif = req.params.nif; // Assuming nif is passed as a URL parameter
-    const query = 'SELECT email FROM usuarios WHERE nif = $1';
+
+
+// Função para obter todos os e-mails dos usuários
+async function pegarEmails() {
+    const query = 'SELECT email FROM usuarios';
     try {
-        const resultado = await db.query(query, [nif]);
-        if (resultado.rows.length == 0) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
-        const email = resultado.rows[0].email;
-        return email;
-
+        const resultado = await db.query(query);
+        return resultado.rows.map(row => row.email); // Retorna uma lista de e-mails
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+        console.error('Erro ao buscar e-mails:', error);
+        return [];
     }
-} 
+}
+
 // Configuração do transporte de email
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -62,23 +59,27 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Enviar email
+cron.schedule('20 14 * * 1-5', async () => {
+    const recipients = await pegarEmails(); // Obtem todos os e-mails dos usuários
+    if (recipients.length === 0) {
+        console.log('Nenhum destinatário encontrado.');
+        return;
+    }
+    
+    transporter.sendMail({
+        from: 'Isabela Souza <isabelasouzade.564@gmail.com>',
+        to: recipients.join(', '),
+        subject: 'Teste de envio de email #choracaique2',
+        html: '<h1>Olá, este é um teste de envio de email.</h1>',
+        text: 'Olá, este é um teste de envio de email.'
+    }).then((response) => {
+        console.log('Email enviado com sucesso:', response);
+    }).catch((error) => {
+        console.error('Erro ao enviar email:', error);
+    });
+});
 
 app.listen(3001, () => {
     console.log('Servidor rodando na porta 3001');
-    cron.schedule('44 21 * * 1-5', () => {
-        transporter.sendMail({
-            from: 'Isabela Souza <isabelasouzade.564@gmail.com>',
-            to: recipients.join(', '),
-            subject: 'Teste de envio de email #choracaique2',
-            html: '<h1>Olá, este é um teste de envio de email.oiiiiiiii</h1>',
-            text: 'Olá, este é um teste de envio de email.oiiiii2'
-        }).then((response) => {
-            console.log('Email enviado com sucesso:', response);
-        }).catch((error) => {
-            console.error('Erro ao enviar email:', error);
-        });
-    });
-
-
 });
+
