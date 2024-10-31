@@ -10,10 +10,10 @@ const nodemailer = require('nodemailer');
 
 // Função para obter todos os e-mails dos usuários
 async function pegarEmails() {
-    const query = 'SELECT email FROM usuarios';
+    const query = 'SELECT nome, email FROM usuarios';
     try {
         const resultado = await db.query(query);
-        return resultado.rows.map(row => row.email); // Retorna uma lista de e-mails
+        return resultado.rows; // retorna uma lista de e-mails
     } catch (error) {
         console.error('Erro ao buscar e-mails:', error);
         return [];
@@ -59,24 +59,27 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-cron.schedule('20 14 * * 1-5', async () => {
-    const recipients = await pegarEmails(); // Obtem todos os e-mails dos usuários
-    if (recipients.length === 0) {
+cron.schedule('52 15 * * 1-5', async () => {
+    const recipients = await pegarEmails();
+    if (recipients.length == 0) {
         console.log('Nenhum destinatário encontrado.');
         return;
     }
-    
-    transporter.sendMail({
-        from: 'Isabela Souza <isabelasouzade.564@gmail.com>',
-        to: recipients.join(', '),
-        subject: 'Teste de envio de email #choracaique2',
-        html: '<h1>Olá, este é um teste de envio de email.</h1>',
-        text: 'Olá, este é um teste de envio de email.'
-    }).then((response) => {
-        console.log('Email enviado com sucesso:', response);
-    }).catch((error) => {
-        console.error('Erro ao enviar email:', error);
-    });
+
+
+    for (const { nome, email } of recipients) { 
+        transporter.sendMail({
+            from: 'Isabela Souza <isabelasouzade.564@gmail.com>',
+            to: email,
+            subject: 'Teste de envio de email #choracaique2',
+            html: `<p>Olá ${nome}, este é um teste de envio de email.</p>`, 
+            text: `Olá ${nome}, este é um teste de envio de email.`
+        }).then((response) => {
+            console.log(`Email enviado com sucesso para ${nome}:`, response);
+        }).catch((error) => {
+            console.error(`Erro ao enviar email para ${nome}:`, error);
+        });
+    }
 });
 
 app.listen(3001, () => {
