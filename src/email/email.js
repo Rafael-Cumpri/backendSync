@@ -1,10 +1,24 @@
 const express = require('express');
 const cron = require('node-cron');
-
+const db = require('../config/dbconfig');
 const app = express();
 
 //nodemailer é uma biblioteca para envio de email
 const nodemailer = require('nodemailer');
+
+
+
+// Função para obter todos os e-mails dos usuários
+async function pegarEmails() {
+    const query = 'SELECT nome, email FROM usuarios';
+    try {
+        const resultado = await db.query(query);
+        return resultado.rows; // retorna uma lista de e-mails
+    } catch (error) {
+        console.error('Erro ao buscar e-mails:', error);
+        return [];
+    }
+}
 
 // Configuração do transporte de email
 const transporter = nodemailer.createTransport({
@@ -45,28 +59,30 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Lista de destinatários
-const recipients = [
-    'isabela.souza7@aluno.senai.br',
-];
+cron.schedule('52 15 * * 1-5', async () => {
+    const recipients = await pegarEmails();
+    if (recipients.length == 0) {
+        console.log('Nenhum destinatário encontrado.');
+        return;
+    }
 
-// Enviar email
+
+    for (const { nome, email } of recipients) { 
+        transporter.sendMail({
+            from: 'Isabela Souza <isabelasouzade.564@gmail.com>',
+            to: email,
+            subject: 'Teste de envio de email #choracaique2',
+            html: `<p>Olá ${nome}, este é um teste de envio de email.</p>`, 
+            text: `Olá ${nome}, este é um teste de envio de email.`
+        }).then((response) => {
+            console.log(`Email enviado com sucesso para ${nome}:`, response);
+        }).catch((error) => {
+            console.error(`Erro ao enviar email para ${nome}:`, error);
+        });
+    }
+});
 
 app.listen(3001, () => {
     console.log('Servidor rodando na porta 3001');
-    cron.schedule('44 21 * * 1-5', () => {
-        transporter.sendMail({
-            from: 'Isabela Souza <isabelasouzade.564@gmail.com>',
-            to: recipients.join(', '),
-            subject: 'Teste de envio de email #choracaique2',
-            html: '<h1>Olá, este é um teste de envio de email.oiiiiiiii</h1>',
-            text: 'Olá, este é um teste de envio de email.oiiiii2'
-        }).then((response) => {
-            console.log('Email enviado com sucesso:', response);
-        }).catch((error) => {
-            console.error('Erro ao enviar email:', error);
-        });
-    });
-
-
 });
+
