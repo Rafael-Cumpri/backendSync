@@ -69,20 +69,6 @@ async function getAmbientes(req, res) {
     }
 }
 
-async function getAmbienteByName(req, res) {
-    const { nome } = req.params; // Obtém o nome da URL
-    const query = "SELECT * FROM ambientes WHERE nome ILIKE $1"; // ILIKE para busca sem diferenciar maiúsculas de minúsculas
-    try {
-        const result = await pool.query(query, [`%${nome}%`]); // Adiciona % para buscar correspondências parciais
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: 'Nenhum ambiente encontrado' });
-        }
-        res.status(200).json(result.rows); // Retorna os ambientes encontrados
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro interno do servidor', error: error });
-    }
-}
 // Função para deletar usuários
 // Função para deletar ambientes
 async function deleteAmbientes(req, res) {
@@ -191,19 +177,35 @@ async function updateAmbiente(req, res) {
 }
 
 
-async function getAmbienteByName(req, res) {
+async function getAmbienteByParam(req, res) {
     try {
-        const { id } = req.params;
-        const query = 'SELECT * FROM ambientes WHERE numero_ambiente = $1';
-        const result = await pool.query(query, [id]);
+        const { param } = req.params;
+        let query, values;
+
+        if (isNaN(param)) {
+            // Buscar por nome
+            query = "SELECT * FROM ambientes WHERE nome ILIKE $1";
+            values = [`%${param}%`];
+        } else {
+            // Buscar por número do ambiente
+            query = 'SELECT * FROM ambientes WHERE numero_ambiente = $1';
+            values = [param];
+        }
+
+        const result = await pool.query(query, values);
+
+        if (result.rows[0].length === 0) {
+            return res.status(404).json({ message: 'Nenhum ambiente encontrado' });
+        }
+
         res.status(200).json(result.rows[0]);
     } catch (error) {
         console.error('Erro ao buscar ambiente', error);
         res.status(500).send('Erro ao buscar ambiente');
-    };
+    }
 }
 
 
 
 
-module.exports = { postAmbientes, getAmbientes, deleteAmbientes, updateAmbiente, getAmbienteByName, upload };
+module.exports = { postAmbientes, getAmbientes, deleteAmbientes, updateAmbiente, getAmbienteByParam, upload };
