@@ -35,6 +35,18 @@ async function getHistorico(req, res) {
     }
 }
 
+async function getHistoricoInfos(req, res) {
+    const query = 'SELECT historico.id, historico.data_inicio, historico.data_fim, historico.deleted, usuarios.nome AS nome_usuario, ambientes.nome AS nome_ambiente, ambientes.caminho_imagem AS imagem_ambiente,ambientes.disponivel AS disponibilidade FROM historico JOIN usuarios ON historico.funcionario = usuarios.nif JOIN ambientes ON historico.ambiente = ambientes.numero_ambiente WHERE historico.deleted = FALSE;';
+
+    try {
+        const result = await pool.query(query);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+    }
+}
+
 async function deleteHistorico(req, res){
     try {
         const { id } = req.params;
@@ -75,4 +87,4 @@ async function devolverAmbiente(req, res) {
     }
 }
 
-module.exports = { newPromiseClass, getHistorico, deleteHistorico, updateHistorico, devolverAmbiente };
+module.exports = { newPromiseClass, getHistorico, deleteHistorico, updateHistorico, devolverAmbiente, getHistoricoInfos };
