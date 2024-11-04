@@ -69,6 +69,20 @@ async function getAmbientes(req, res) {
     }
 }
 
+async function getAmbienteByName(req, res) {
+    const { nome } = req.params; // Obtém o nome da URL
+    const query = "SELECT * FROM ambientes WHERE nome ILIKE $1"; // ILIKE para busca sem diferenciar maiúsculas de minúsculas
+    try {
+        const result = await pool.query(query, [`%${nome}%`]); // Adiciona % para buscar correspondências parciais
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Nenhum ambiente encontrado' });
+        }
+        res.status(200).json(result.rows); // Retorna os ambientes encontrados
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro interno do servidor', error: error });
+    }
+}
 // Função para deletar usuários
 // Função para deletar ambientes
 async function deleteAmbientes(req, res) {
@@ -124,4 +138,4 @@ async function editAmbientes(req, res) {
 
 
 
-module.exports = { postAmbientes, getAmbientes, deleteAmbientes, editAmbientes, upload };
+module.exports = { postAmbientes, getAmbientes, deleteAmbientes, editAmbientes, getAmbienteByName, upload };
