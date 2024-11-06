@@ -24,7 +24,20 @@ async function newPromiseClass(req, res) {
 }
 
 async function getHistorico(req, res) {
-    const query = 'SELECT * FROM historico';
+    const query = `
+        SELECT 
+            historico.*, 
+            usuarios.nome AS funcionario_nome, 
+            usuarios.caminho_imagem AS funcionario_imagem,
+            ambientes.nome AS ambiente_nome,
+            ambientes.caminho_imagem AS ambiente_imagem
+        FROM 
+            historico
+        JOIN 
+            usuarios ON historico.funcionario = usuarios.nif
+        JOIN 
+            ambientes ON historico.ambiente = ambientes.numero_ambiente
+    `;
 
     try {
         const result = await pool.query(query);
