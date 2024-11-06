@@ -140,33 +140,22 @@ async function updateAmbiente(req, res) {
 
     try {
         const ambienteAntigo = await pool.query('SELECT * FROM ambientes WHERE numero_ambiente = $1', [id]);
-        let result;
-
-        if (ambienteAntigo.rows[0].numero_ambiente !== numero_ambiente && ambienteAntigo.rows[0].chave === true) {
-            await pool.query('DELETE FROM chaves WHERE salas = $1', [id]);
-            result = await pool.query(query, values);
-            await pool.query('INSERT INTO chaves (id, disponivel, salas) VALUES ($1, $2, $3)', [numero_ambiente, true, numero_ambiente]);
+        if (ambienteAntigo.rows[0].disponivel == false) {
+            return res.status(401).json({ message: 'O ambiente não pode ser editado pois está ocupado.' });
         }
 
-        if (ambienteAntigo.rows[0].chave === false && chave === true) {
-            result = await pool.query(query, values);
-            await pool.query('INSERT INTO chaves (id, disponivel, salas) VALUES ($1, $2, $3)', [numero_ambiente, true, numero_ambiente]);
-        } else if (ambienteAntigo.rows[0].chave === true && chave === false) {
-            await pool.query('DELETE FROM chaves WHERE salas = $1', [numero_ambiente]);
-            result = await pool.query(query, values);
-        } else if (ambienteAntigo.rows[0].chave === true && chave === true) {
-            await pool.query('DELETE FROM chaves WHERE salas = $1', [id]);
-            result = await pool.query(query, values);
-            await pool.query('INSERT INTO chaves (id, disponivel, salas) VALUES ($1, $2, $3)', [numero_ambiente, true, numero_ambiente]);
-        } else if (ambienteAntigo.rows[0].chave === false && chave === false) {
-            await pool.query('DELETE FROM chaves WHERE salas = $1', [numero_ambiente]);
-            result = await pool.query(query, values);
+        await pool.query(query, values);
+
+        console.log(chave)
+
+        if (chave == true) {
+            const chaveExists = await pool.query('SELECT * FROM chaves WHERE salas = $1', [numero_ambiente]);
+            console.log(chaveExists.rows)
+            if (chaveExists.rows == []) {
+                await pool.query('INSERT INTO chaves (id, disponivel, salas) VALUES ($1, $2, $3)', [numero_ambiente, true, numero_ambiente]);
+            }
         } else {
-            console.log('Erro ao atualizar chave');
-        }
-
-        if (result.rowCount === 0) {
-            return res.status(404).json({ message: 'Ambiente não encontrado' });
+            await pool.query('DELETE FROM chaves WHERE salas = $1', [id]);
         }
 
         res.status(200).json({ message: 'Ambiente atualizado com sucesso' });
