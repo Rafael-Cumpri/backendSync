@@ -66,7 +66,7 @@ async function getUsuarios(req, res) {
         res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
     }
 }
-async function getUsuariosByNif(req, res) {
+/* async function getUsuariosByNif(req, res) {
   
 
     try {
@@ -77,8 +77,35 @@ async function getUsuariosByNif(req, res) {
         console.error(error);
         res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
     }
-}
-  
+} */
+async function getUsuarioByParam(req, res) {
+    try {
+        const { param } = req.params;
+        let query, values;
+
+        if (isNaN(param)) {
+            // Buscar por nome
+            query = "SELECT * FROM usuarios WHERE nome ILIKE $1";
+            values = [`%${param}%`];
+        } else {
+            // Buscar por número do usuario
+            query = 'SELECT * FROM usuarios WHERE nif = $1';
+            values = [param];
+        }
+
+        const result = await pool.query(query, values);
+
+        console.log(result.rows[0])
+
+        if (result.rows[0].length === 0) {
+            return res.status(404).json({ message: 'Nenhum usuario encontrado' });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao buscar usuario', error);
+        res.status(500).send('Erro ao buscar usuario');
+    }}
 //delete usuarios
 async function deleteUsuario (req, res) {
     try {
@@ -129,4 +156,4 @@ async function userLogin(req, res) {
         res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
     }
 }
-module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuariosByNif, userLogin };
+module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuarioByParam, userLogin };
