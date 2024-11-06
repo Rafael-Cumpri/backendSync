@@ -28,7 +28,9 @@ async function getHistorico(req, res) {
         SELECT 
             historico.*, 
             usuarios.nome AS funcionario_nome, 
-            ambientes.nome AS ambiente_nome 
+            usuarios.caminho_imagem AS funcionario_imagem,
+            ambientes.nome AS ambiente_nome,
+            ambientes.caminho_imagem AS ambiente_imagem
         FROM 
             historico
         JOIN 
