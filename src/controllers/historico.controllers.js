@@ -100,4 +100,27 @@ async function devolverAmbiente(req, res) {
     }
 }
 
-module.exports = { newPromiseClass, getHistorico, deleteHistorico, updateHistorico, devolverAmbiente, getHistoricoInfos };
+async function devolverAmbienteADM(req, res) {
+    try {
+        const { id } = req.params;
+        const { data_fim } = req.body;
+        
+        await pool.query('UPDATE historico SET data_fim = $1 WHERE id = $2', [data_fim, id]);
+        const responseHistorico = await pool.query('SELECT * FROM historico WHERE id = $1', [id]);
+        await pool.query('UPDATE ambientes SET disponivel = true WHERE numero_ambiente = $1', [responseHistorico.rows[0].ambiente]);
+        
+        const responseAmbiente = await pool.query('SELECT * FROM ambientes WHERE numero_ambiente = $1', [id]);
+        
+        if (responseAmbiente.rows[0]?.chave === 'true') {
+            await pool.query('UPDATE chaves SET disponivel = true WHERE salas = $1', [id]);
+        }
+        
+        res.status(200).send({ mensagem: 'atualizado com sucesso' });
+    } catch (err) {
+        console.error('erro ao devolver ambiente', err);
+        res.status(500).send('Erro ao devolver ambiente');
+    }
+}
+
+
+module.exports = { newPromiseClass, getHistorico, deleteHistorico, updateHistorico, devolverAmbiente, getHistoricoInfos, devolverAmbienteADM };

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { newPromiseClass, getHistorico, deleteHistorico, updateHistorico, devolverAmbiente, getHistoricoInfos } = require('../controllers/historico.controllers');
+const { newPromiseClass, getHistorico, deleteHistorico, updateHistorico, devolverAmbiente, getHistoricoInfos, devolverAmbienteADM } = require('../controllers/historico.controllers');
 
 
 
@@ -11,5 +11,6 @@ router.get('/historico/infos', getHistoricoInfos);
 router.delete('/historico/:id', deleteHistorico)
 // router.put('/historico/:id', updateHistorico)
 router.put('/historico', devolverAmbiente)
+router.post('/historico/devolver/:id', devolverAmbienteADM)
 
 module.exports = router;
