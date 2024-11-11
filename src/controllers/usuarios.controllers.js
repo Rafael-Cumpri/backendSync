@@ -201,4 +201,34 @@ async function userLogin(req, res) {
         res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
     }
 }
-module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuarioByParam, userLogin };
+
+async function deletarImagensSemUsuario(req, res) {
+    try {
+        // Diretório onde estão as pastas dos usuários
+        const funcionariosDir = path.join(__dirname, '..', '..', 'uploads', 'funcionarios');
+
+        // Obtenha a lista de pastas dentro de "funcionarios"
+        const folders = fs.readdirSync(funcionariosDir);
+
+        // Obtenha todos os nomes dos usuários do banco de dados
+        const query = 'SELECT nome FROM usuarios';
+        const result = await pool.query(query);
+        const userNames = result.rows.map(user => user.nome);
+
+        // Percorra as pastas e apague as que não estão associadas a nenhum usuário
+        folders.forEach(folder => {
+            if (!userNames.includes(folder)) {
+                const folderPath = path.join(funcionariosDir, folder);
+                fs.rmSync(folderPath, { recursive: true, force: true });
+                console.log(`Pasta '${folder}' deletada, pois não está associada a nenhum usuário.`);
+            }
+        });
+
+        res.status(200).json({ message: 'Pastas sem usuário associado foram deletadas com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao deletar pastas sem usuário associado:', error);
+        res.status(500).json({ message: 'Erro ao deletar pastas sem usuário associado', error: error.message });
+    }
+}
+
+module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuarioByParam, userLogin, deletarImagensSemUsuario };
