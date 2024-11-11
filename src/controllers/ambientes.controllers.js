@@ -92,7 +92,7 @@ async function deleteAmbientes(req, res) {
 // Função para editar usuários
 async function updateAmbiente(req, res) {
     const { id } = req.params;
-    const { nome, numero_ambiente, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria } = req.body;
+    const { nome, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria, chaveNumero } = req.body;
     const image = req.file;
 
     if (nome && nome.length < 3) {
@@ -122,23 +122,22 @@ async function updateAmbiente(req, res) {
     const query = `
         UPDATE ambientes 
         SET nome = $1, 
-            numero_ambiente = $2, 
-            caminho_imagem = COALESCE($3, caminho_imagem), 
-            chave = $4, 
-            capacidadeAlunos = $5, 
-            tipodoambiente = $6, 
-            ar_condicionado = $7, 
-            ventilador = $8, 
-            wifi = $9, 
-            projetor = $10, 
-            chave_eletronica = $11, 
-            maquinas = $12, 
-            disponivel = $13, 
-            categoria = $14
-        WHERE numero_ambiente = $15
+            caminho_imagem = COALESCE($2, caminho_imagem), 
+            chave = $3, 
+            capacidadeAlunos = $4, 
+            tipodoambiente = $5, 
+            ar_condicionado = $6, 
+            ventilador = $7, 
+            wifi = $8, 
+            projetor = $9, 
+            chave_eletronica = $10, 
+            maquinas = $11, 
+            disponivel = $12, 
+            categoria = $13
+        WHERE numero_ambiente = $14
     `;
 
-    const values = [nome, numero_ambiente, imageURL, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria, id];
+    const values = [nome, imageURL, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria, id];
 
     try {
         const ambienteAntigo = await pool.query('SELECT * FROM ambientes WHERE numero_ambiente = $1', [id]);
@@ -148,13 +147,10 @@ async function updateAmbiente(req, res) {
 
         await pool.query(query, values);
 
-        console.log(chave)
-
-        if (chave == true) {
-            const chaveExists = await pool.query('SELECT * FROM chaves WHERE salas = $1', [numero_ambiente]);
-            console.log(chaveExists.rows)
-            if (chaveExists.rows == []) {
-                await pool.query('INSERT INTO chaves (id, disponivel, salas) VALUES ($1, $2, $3)', [numero_ambiente, true, numero_ambiente]);
+        if (chave == 'true') {
+            const chaveExists = await pool.query('SELECT * FROM chaves WHERE salas = $1', [id]);
+            if (chaveExists.rows.length === 0) {
+                await pool.query('INSERT INTO chaves (id, disponivel, salas) VALUES ($1, $2, $3)', [chaveNumero, true, id]);
             }
         } else {
             await pool.query('DELETE FROM chaves WHERE salas = $1', [id]);
