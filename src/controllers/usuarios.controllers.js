@@ -95,7 +95,7 @@ async function getUsuarioByParam(req, res) {
 
         const result = await pool.query(query, values);
 
-        console.log(result.rows[0])
+        // console.log(result.rows[0])
 
         if (result.rows[0].length === 0) {
             return res.status(404).json({ message: 'Nenhum usuario encontrado' });
@@ -119,15 +119,60 @@ async function deleteUsuario (req, res) {
 };
 //editar usuarios
 async function editUsuarios(req, res) {
+    const { nif } = req.params;
+    const { nome, descriptor, notificacao, notiwhere, telefone, email, adm } = req.body;
+    const image = req.file;
+
+    console.log(image)
+
+    // Verificações de campos obrigatórios
+    if (!nif) {
+        return res.status(401).json({ message: 'O NIF precisa ser um valor real e válido!' });
+    }
+
+    if (!descriptor) {
+        return res.status(401).json({ message: 'Usuário sem descrição facial, mande outra imagem!' });
+    }
+
+    let imageURL;
+    if (image) {
+        // Diretório de armazenamento de imagens
+        const directory = path.join(__dirname, '..', '..', 'uploads', 'funcionarios', nome);
+        if (!fs.existsSync(directory)) {
+            fs.mkdirSync(directory, { recursive: true });
+        }
+
+        // Move a nova imagem para o diretório correto
+        const imagePath = path.join(directory, image.originalname);
+        try {
+            fs.renameSync(image.path, imagePath);  // Move o arquivo temporário
+            imageURL = `/uploads/funcionarios/${encodeURIComponent(nome)}/${image.originalname}`;
+        } catch (err) {
+            return res.status(500).json({ message: 'Erro ao mover a imagem', error: err.message });
+        }
+    }
+
+    // Cria o SQL de atualização, incluindo o caminho da imagem se ela for enviada
+    const query = `
+        UPDATE usuarios SET 
+            nome = $1, 
+            caminho_imagem = COALESCE($2, caminho_imagem), 
+            descriptor = $3, 
+            notificacao = $4, 
+            notiwhere = $5, 
+            telefone = $6, 
+            email = $7, 
+            adm = $8 
+        WHERE nif = $9
+    `;
+    const values = [nome, imageURL, descriptor, notificacao, notiwhere, telefone, email, adm, nif];
+
     try {
-        const { nif } = req.params;
-        const { nome, descriptor, notificacao, notiwhere, telefone, email, adm } = req.body;
-            await pool.query('UPDATE usuarios SET nome = $1, descriptor = $2, notificacao = $3, notiwhere = $4, telefone = $5, email = $6, adm = $7 WHERE nif = $8', [nome, descriptor, notificacao, notiwhere, telefone, email, adm, nif]);
-            res.status(200).send({ mensagem: ' usuario atualizado' });
-        
+        await pool.query(query, values);
+        res.status(200).json({ mensagem: 'Usuário atualizado com sucesso' });
     } catch (error) {
-        console.error('erro ao atualizar usuario', error);
-        res.status(500).send('erro ao atualizar usuario');
+        console.error('Erro ao atualizar usuário', error);
+        res.status(500).json({ message: 'Erro ao atualizar usuário', error: error.message });
     }
 }
 
