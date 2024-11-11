@@ -7,14 +7,16 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
 async function postAmbientes(req, res) {
-    const { nome, numero_ambiente, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria } = req.body;
+    const { nome, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria } = req.body;
     const image = req.file;
+    let numero_ambiente = await pool.query('SELECT MAX(numero_ambiente) FROM ambientes');
+    numero_ambiente = numero_ambiente.rows[0].max + 1;
 
-    console.log(nome, numero_ambiente, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria)
+    console.log(nome, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria)
 
     // Verifica se a imagem foi enviada
     if (!image) {
-        return res.status(400).json({ message: nome, numero_ambiente, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria });
+        return res.status(400).json({ message: nome, chave, capacidadeAlunos, tipodoambiente, ar_condicionado, ventilador, wifi, projetor, chave_eletronica, maquinas, disponivel, categoria });
     }
 
     // Cria o diretório para armazenar a imagem, se não existir
@@ -50,7 +52,7 @@ async function postAmbientes(req, res) {
 
     try {
         await pool.query(query, values);
-        res.status(200).json({ message: 'Ambiente adicionado com sucesso' });
+        res.status(200).json({ message: numero_ambiente});
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
