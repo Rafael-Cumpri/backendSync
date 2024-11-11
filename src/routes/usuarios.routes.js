@@ -9,7 +9,7 @@ router.post('/usuarios', upload.single('image'), postUsuario);  // Middleware de
 router.get('/usuarios', getUsuarios);
 router.get('/usuarios/:param', getUsuarioByParam)
 router.delete('/usuarios/:nif', deleteUsuario)
-router.put('/usuarios/:nif', editUsuarios)
+router.put('/usuarios/:nif', upload.single('image'), editUsuarios)
 router.post('/usuarios/login', userLogin);
 
 module.exports = router;

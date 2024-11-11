@@ -9,6 +9,12 @@ async function newPromiseClass(req, res) {
     const query = `INSERT INTO historico (data_inicio, data_fim, deleted, funcionario, ambiente) VALUES ($1, $2, $3, $4, $5)`;
     const values = [data_inicio, data_fim, deleted, funcionario, ambiente];
 
+    console.log(values)
+
+    if (!data_inicio || !funcionario || !ambiente) {
+        return res.status(400).json({ message: 'Dados inválidos' });
+    }
+
     try {
         await pool.query(query, values);
         await pool.query('UPDATE ambientes SET disponivel = false WHERE numero_ambiente = $1', [ambiente]);
@@ -23,7 +29,33 @@ async function newPromiseClass(req, res) {
     }
 }
 
+// async function getHistorico(req, res) {
+//     const query = `
+//         SELECT 
+//             historico.*, 
+//             usuarios.nome AS funcionario_nome, 
+//             usuarios.caminho_imagem AS funcionario_imagem,
+//             ambientes.nome AS ambiente_nome,
+//             ambientes.caminho_imagem AS ambiente_imagem
+//         FROM 
+//             historico
+//         JOIN 
+//             usuarios ON historico.funcionario = usuarios.nif
+//         JOIN 
+//             ambientes ON historico.ambiente = ambientes.numero_ambiente
+//     `;
+
+//     try {
+//         const result = await pool.query(query);
+//         res.status(200).json(result.rows);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+//     }
+// }
+
 async function getHistorico(req, res) {
+    const { id } = req.params;
     const query = `
         SELECT 
             historico.*, 
@@ -37,10 +69,12 @@ async function getHistorico(req, res) {
             usuarios ON historico.funcionario = usuarios.nif
         JOIN 
             ambientes ON historico.ambiente = ambientes.numero_ambiente
+        WHERE 
+            historico.funcionario = $1 AND historico.deleted = FALSE
     `;
 
     try {
-        const result = await pool.query(query);
+        const result = await pool.query(query, [id]);
         res.status(200).json(result.rows);
     } catch (error) {
         console.error(error);
@@ -49,7 +83,7 @@ async function getHistorico(req, res) {
 }
 
 async function getHistoricoInfos(req, res) {
-    const query = 'SELECT historico.id, historico.data_inicio, historico.data_fim, historico.deleted, usuarios.nome AS nome_usuario, ambientes.nome AS nome_ambiente, ambientes.caminho_imagem AS imagem_ambiente,ambientes.disponivel AS disponibilidade FROM historico JOIN usuarios ON historico.funcionario = usuarios.nif JOIN ambientes ON historico.ambiente = ambientes.numero_ambiente WHERE historico.deleted = FALSE;';
+    const query = 'SELECT historico.*, usuarios.nome AS nome_usuario, usuarios.caminho_imagem AS funcionario_imagem, ambientes.nome AS nome_ambiente, ambientes.caminho_imagem AS imagem_ambiente,ambientes.disponivel AS disponibilidade FROM historico JOIN usuarios ON historico.funcionario = usuarios.nif JOIN ambientes ON historico.ambiente = ambientes.numero_ambiente WHERE historico.deleted = false;';
 
     try {
         const result = await pool.query(query);
