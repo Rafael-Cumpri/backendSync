@@ -6,7 +6,7 @@ const { newPromiseClass, getHistorico, deleteHistorico, updateHistorico, devolve
 
 // Rotas
 router.post('/historico', newPromiseClass); 
-router.get('/historico', getHistorico); 
+router.get('/historico/:id', getHistorico); 
 router.get('/historico/infos', getHistoricoInfos); 
 router.delete('/historico/:id', deleteHistorico)
 // router.put('/historico/:id', updateHistorico)
