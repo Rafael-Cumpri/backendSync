@@ -55,4 +55,19 @@ async function updateKeys(req, res) {
     }
 }
 
-module.exports = { postNewKey, getKeys, deleteKeys, updateKeys };
+async function getKeyBySalasId(req, res) {
+    const { salas } = req.params;
+    const query = 'SELECT * FROM chaves WHERE salas = $1';
+    const values = [salas];
+
+    try {
+        const result = await pool.query(query, values);
+        res.status(200).json(result.rows);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+    }
+}
+
+module.exports = { postNewKey, getKeys, deleteKeys, updateKeys, getKeyBySalasId };
