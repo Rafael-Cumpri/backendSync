@@ -192,7 +192,21 @@ async function getAmbienteByParam(req, res) {
     }
 }
 
+async function deletarImagensSemAmbiente(req, res) {
+    const query = 'SELECT * FROM ambientes';
+    const result = await pool.query(query);
 
+    const ambientes = result.rows;
+    const directory = path.join(__dirname, '..', '..', 'uploads', 'ambientes');
 
+    const files = fs.readdirSync(directory);
+    for (const file of files) {
+        if (!ambientes.find(ambiente => file === ambiente.nome)) {
+            fs.rmdirSync(path.join(directory, file), { recursive: true });
+        }
+    }
 
-module.exports = { postAmbientes, getAmbientes, deleteAmbientes, updateAmbiente, getAmbienteByParam, upload };
+    res.status(200).json({ message: 'Imagens deletadas com sucesso' });
+}
+
+module.exports = { postAmbientes, getAmbientes, deleteAmbientes, updateAmbiente, getAmbienteByParam, upload, deletarImagensSemAmbiente };
