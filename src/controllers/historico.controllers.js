@@ -156,5 +156,30 @@ async function devolverAmbienteADM(req, res) {
     }
 }
 
+async function getFullHistorico(req, res) {
+    const query = `
+        SELECT 
+            historico.*, 
+            usuarios.nome AS funcionario_nome, 
+            usuarios.caminho_imagem AS funcionario_imagem,
+            ambientes.nome AS ambiente_nome,
+            ambientes.caminho_imagem AS ambiente_imagem
+        FROM 
+            historico
+        JOIN 
+            usuarios ON historico.funcionario = usuarios.nif
+        JOIN 
+            ambientes ON historico.ambiente = ambientes.numero_ambiente
+    `;
 
-module.exports = { newPromiseClass, getHistorico, deleteHistorico, updateHistorico, devolverAmbiente, getHistoricoInfos, devolverAmbienteADM };
+    try {
+        const result = await pool.query(query);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+    }
+}
+
+
+module.exports = { newPromiseClass, getHistorico, deleteHistorico, updateHistorico, devolverAmbiente, getHistoricoInfos, devolverAmbienteADM, getFullHistorico };
