@@ -7,11 +7,11 @@ const { newPromiseClass, getHistorico, deleteHistorico, updateHistorico, devolve
 // Rotas
 router.post('/historico', newPromiseClass); 
 router.get('/historico/:id', getHistorico); 
-router.get('/historico/infos', getHistoricoInfos); 
+router.get('/historico/infos/filtered', getHistoricoInfos);
+router.get('/historico/full/infos', getFullHistorico); 
 router.delete('/historico/:id', deleteHistorico)
 // router.put('/historico/:id', updateHistorico)
 router.put('/historico', devolverAmbiente)
 router.post('/historico/devolver/:id', devolverAmbienteADM)
-router.get('/historico/full', getFullHistorico)
 
 module.exports = router;
