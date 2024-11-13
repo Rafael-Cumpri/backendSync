@@ -60,9 +60,10 @@ CREATE TABLE chaves (
 -- Criação da tabela historico
 CREATE TABLE historico (
     id SERIAL PRIMARY KEY,
-    data_inicio DATE,
-    data_fim DATE DEFAULT NULL,
+    data_inicio TIMESTAMP,
+    data_fim TIMESTAMP DEFAULT NULL,
     deleted BOOLEAN,
     funcionario VARCHAR(255) REFERENCES usuarios(nif),
     ambiente INT REFERENCES ambientes(numero_ambiente)
 );
+
