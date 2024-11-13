@@ -120,10 +120,13 @@ async function updateHistorico(req, res) {
 
 async function devolverAmbiente(req, res) {
     try {
-        const { id, data_fim, funcionario, ambiente } = req.body;
+        const { id, data_fim, ambiente } = req.body;
+        console.log(`Devolvendo ambiente: ${ambiente} para o histórico ID: ${id}`);
         await pool.query('UPDATE historico SET data_fim = $1 WHERE id = $2', [data_fim, id])
         await pool.query('UPDATE ambientes SET disponivel = true WHERE numero_ambiente = $1', [ambiente])
+
         const responseAmbiente = await pool.query('SELECT * FROM ambientes WHERE numero_ambiente = $1', [ambiente]);
+        console.log("Ambiente após atualização:", responseAmbiente.rows[0]);
         if(responseAmbiente.rows[0].chave === true) {
             await pool.query('UPDATE chaves SET disponivel = true WHERE salas = $1', [ambiente]);
         }
