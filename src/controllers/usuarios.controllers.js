@@ -231,4 +231,39 @@ async function deletarImagensSemUsuario(req, res) {
     }
 }
 
-module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuarioByParam, userLogin, deletarImagensSemUsuario };
+async function atualizarNotificacoes(req, res) {
+    const { nif } = req.params;
+    const { notificacao, notiwhere } = req.body;
+
+    if (notificacao === undefined || !notiwhere) {
+        return res.status(400).json({ message: 'Os campos notificacao e notiwhere são obrigatórios.' });
+    }
+
+    const validOptions = ['whatsapp', 'email', 'ambos'];
+    if (!validOptions.includes(notiwhere)) {
+        return res.status(400).json({ message: 'O campo notiwhere deve ser "whatsapp", "email" ou "ambos".' });
+    }
+
+    const query = `
+        UPDATE usuarios 
+        SET notificacao = $1, notiwhere = $2 
+        WHERE nif = $3
+        RETURNING *;
+    `;
+    const values = [notificacao, notiwhere, nif];
+
+    try {
+        const result = await pool.query(query, values);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+
+        res.status(200).json({ message: 'Preferências de notificações atualizadas com sucesso.', usuario: result.rows[0] });
+    } catch (error) {
+        console.error('Erro ao atualizar notificações:', error);
+        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+    }
+}
+
+
+module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuarioByParam, userLogin, deletarImagensSemUsuario, atualizarNotificacoes };

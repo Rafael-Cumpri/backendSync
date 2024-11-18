@@ -82,7 +82,7 @@ cron.schedule('52 15 * * 1-5', async () => {
     }
 });
 
-app.listen(3001, () => {
-    console.log('Servidor rodando na porta 3001');
+app.listen(3003, () => {
+    console.log('Servidor rodando na porta 3033');
 });
 
