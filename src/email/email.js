@@ -59,7 +59,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-cron.schedule('52 15 * * 1-5', async () => {
+cron.schedule('47 11 * * 1-5', async () => {
     const recipients = await pegarEmails();
     if (recipients.length == 0) {
         console.log('Nenhum destinatário encontrado.');
@@ -71,7 +71,7 @@ cron.schedule('52 15 * * 1-5', async () => {
         transporter.sendMail({
             from: 'Isabela Souza <isabelasouzade.564@gmail.com>',
             to: email,
-            subject: 'Teste de envio de email #choracaique2',
+            subject: 'Teste de envio de email',
             html: `<p>Olá ${nome}, este é um teste de envio de email.</p>`, 
             text: `Olá ${nome}, este é um teste de envio de email.`
         }).then((response) => {
@@ -83,6 +83,6 @@ cron.schedule('52 15 * * 1-5', async () => {
 });
 
 app.listen(3003, () => {
-    console.log('Servidor rodando na porta 3033');
+    console.log('Servidor rodando na porta 3003');
 });
 
