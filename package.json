@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.js",
     "email": "node src/email/email.js",
-    "zap": "node src/whatsapp/whatsapp.js"
+    "zap": "node src/whatsapp/whatsapp.js",
+    "dev-s": "http-server -S -C cert.pem -K key.pem -p 3033"
   },
   "keywords": [],
   "author": "",
