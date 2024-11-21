@@ -5,7 +5,7 @@ const cron = require('node-cron');
 const db = require('../config/dbconfig');
 
 const app = express();
-const PORT = 3001;
+const PORT = 3003;
 
 app.use(bodyParser.json());
 
@@ -17,9 +17,10 @@ async function getContatos() {
         const result = await db.query(query);
         // Retorna uma lista de contatos
         return result.rows.map(row => ({
-            nome: row.nome,
-            telefone: formatPhone(row.telefone)
-        }));
+            nome: row.nome.split(' ')[0],
+            telefone: formatPhone(row.telefone),
+            notificacao: row.notificacao
+        }));        
     } catch (error) {
         console.error('Erro ao buscar contatos:', error);
         return [];
@@ -57,7 +58,7 @@ app.post('/send-message', async (req, res) => {
 });
 
 // Agendar a mensagem
-cron.schedule('43 15 * * 1-5', async () => {
+cron.schedule('49 20 * * 1-5', async () => {
     const contatos = await getContatos();
 
     if (contatos.length === 0) {
@@ -67,7 +68,7 @@ cron.schedule('43 15 * * 1-5', async () => {
 
     for (const contato of contatos) {
         const { nome, telefone, notificacao } = contato;
-        const message = `Olá ${nome}, esta é uma mensagem agendada!`;
+        const message = `Olá ${nome}, isso é um teste, desconsidere esta mensagem!`;
         if (notificacao) {
             try {
                 await axios.post('http://localhost:3000/api/sendText', {

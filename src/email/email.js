@@ -9,7 +9,11 @@ async function pegarEmails() {
     const query = 'SELECT nome, email, notificacao FROM usuarios';
     try {
         const resultado = await db.query(query);
-        return resultado.rows; // retorna os dados dos usuários
+        return resultado.rows.map(user => ({
+            nome: user.nome.split(' ')[0], 
+            email: user.email,
+            notificacao: user.notificacao
+        }));// retorna os dados dos usuários
     } catch (error) {
         console.error('Erro ao buscar e-mails:', error);
         return [];
@@ -28,7 +32,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Agendamento de tarefa para envio de email
-cron.schedule('04 15 * * 1-5', async () => {
+cron.schedule('49 20 * * 1-5', async () => {
     const recipients = await pegarEmails();
     if (recipients.length == 0) {
         console.log('Nenhum destinatário encontrado.');
@@ -54,6 +58,6 @@ cron.schedule('04 15 * * 1-5', async () => {
     }
 });
 
-app.listen(3003, () => {
+app.listen(3006, () => {
     console.log('Servidor rodando na porta 3003');
 });
