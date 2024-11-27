@@ -60,13 +60,14 @@ app.post('/send-message', async (req, res) => {
 });
 
 // Agendamento de tarefa usando o cron para enviar mensagens automaticamente
-cron.schedule('49 20 * * 1-5', async () => {  // Tarefa agendada para rodar de segunda a sexta-feira, às 20:49
+cron.schedule('15 17 * * 1-5', async () => {  // Tarefa agendada para rodar de segunda a sexta-feira, às 20:49
     const contatos = await getContatos();  // Obtém a lista de contatos
 
     if (contatos.length === 0) {  // Verifica se não há contatos
         if (!contatos.length) return console.log('Nenhum contato encontrado.');  // Loga que não há contatos
         return;
     }
+    
 
     // Envia mensagem para cada contato que tenha a notificação ativada
     for (const contato of contatos) {
