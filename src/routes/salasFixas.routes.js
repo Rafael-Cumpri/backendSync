@@ -1,12 +1,22 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { addFixedClass, getFixedClass, deleteFixedClass, updateFixedClass } = require('../controllers/salafixa.controllers');
+const {
+    addFixedClass,
+    getFixedClasses,
+    deleteFixedClass,
+    updateFixedClass
+} = require("../controllers/salafixa.controllers.js");
 
+// Rota para adicionar uma sala fixa (associando um ambiente a um usuário)
+router.post("/", addFixedClass);
 
+// Rota para buscar as salas fixas de um usuário específico (por NIF)
+router.get("/:usuario_id", getFixedClasses);
 
-// Rotas
-router.post('/salasFixas', addFixedClass); 
-router.get('/salasFixas', getFixedClass);
-router.delete('/salasFixas/:id', deleteFixedClass)
-router.put('/salasFixas/:id', updateFixedClass)
+// Rota para deletar uma sala fixa (por ID)
+router.delete("/:id", deleteFixedClass);
+
+// Rota para atualizar uma sala fixa (por ID)
+router.put("/:id", updateFixedClass);
+
 module.exports = router;

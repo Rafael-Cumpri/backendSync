@@ -1,54 +1,90 @@
-const pool = require('../config/dbconfig')
-
-async function addFixedClass(req, res) {
+const pool = require("../config/dbconfig");
+const addFixedClass = async (req, res) => {
     const { ambiente_id, usuario_id } = req.body;
 
-    const query = `INSERT INTO salas_fixas (ambiente_id, usuario_id) VALUES ($1, $2)`;
-    const values = [ambiente_id, usuario_id];
-
+    // Verificar se o ambiente já está fixado pelo usuário
+    const checkQuery = "SELECT * FROM salas_fixas WHERE ambiente_id = $1 AND usuario_id = $2";
     try {
+        const checkResult = await pool.query(checkQuery, [ambiente_id, usuario_id]);
+
+        if (checkResult.rows.length > 0) {
+            return res.status(400).json({ error: "Esta sala já está fixada pelo usuário." });
+        }
+
+        // Inserir o novo registro de sala fixa
+        const query = "INSERT INTO salas_fixas (ambiente_id, usuario_id) VALUES ($1, $2)";
+        const values = [ambiente_id, usuario_id];
         await pool.query(query, values);
-        res.status(200).json({ message: 'Sala anexada com sucesso' });
+        res.status(200).json({ message: "Sala fixa anexada com sucesso" });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+        console.error("Erro ao adicionar sala fixa:", error);
+        res.status(500).json({ error: "Erro ao associar sala fixa" });
     }
-}
+};
 
-async function getFixedClass(req, res) {
-    const query = 'SELECT * FROM salas_fixas';
+
+const getFixedClasses = async (req, res) => {
+    const { usuario_id } = req.params;
 
     try {
-        const result = await pool.query(query);
+        const query = `
+            SELECT s.id, a.nome AS ambiente_nome, a.numero_ambiente, a.capacidadeAlunos, a.tipodoambiente
+            FROM salas_fixas s
+            JOIN ambientes a ON s.ambiente_id = a.numero_ambiente
+            WHERE s.usuario_id = $1
+        `;
+        const result = await pool.query(query, [usuario_id]);
         res.status(200).json(result.rows);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+        console.error("Erro ao buscar salas fixas:", error);
+        res.status(500).json({ error: "Erro ao buscar salas fixas" });
     }
-}
+};
 
-async function deleteFixedClass(req, res){
+
+const deleteFixedClass = async (req, res) => {
+    const { id } = req.params;
+
     try {
-        const { id } = req.params;
-        await pool.query('DELETE FROM salas_fixas WHERE id = $1', [id]);
-        res.status(200).send({ mensagem: 'sala fixa deletada' });
-    } catch (error) {
-        console.error('erro ao excluir sala fixa', error);
-        res.status(500).send('erro ao excluir sala fixa');
-    }
-}
+        const query = "DELETE FROM salas_fixas WHERE id = $1";
+        const result = await pool.query(query, [id]);
 
-async function updateFixedClass(req, res) {
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "Sala fixa não encontrada." });
+        }
+
+        res.status(200).json({ message: "Sala fixa removida com sucesso" });
+    } catch (error) {
+        console.error("Erro ao excluir sala fixa:", error);
+        res.status(500).json({ error: "Erro ao excluir sala fixa" });
+    }
+};
+
+
+// Função para atualizar uma sala fixa
+const updateFixedClass = async (req, res) => {
+    const { id } = req.params;
+    const { ambiente_id, usuario_id } = req.body;
+
     try {
-        const { id } = req.params;
-        const { ambiente_id, usuario_id } = req.body;
-            await pool.query('UPDATE salas_fixas SET ambiente_id = $1, usuario_id = $2 WHERE id = $3', [ ambiente_id, usuario_id, id]);
-            res.status(200).send({ mensagem: ' sala fixa atualizada' });
-        
-    } catch (error) {
-        console.error('erro ao atualizar sala fixa', error);
-        res.status(500).send('erro ao atualizar sala fixa');
-    }
-}
+        const query = `
+            UPDATE salas_fixas
+            SET ambiente_id = $1, usuario_id = $2
+            WHERE id = $3
+        `;
+        const values = [ambiente_id, usuario_id, id];
 
-module.exports = { addFixedClass, getFixedClass, deleteFixedClass, updateFixedClass };
+        await pool.query(query, values);
+        res.status(200).json({ message: "Sala fixa atualizada com sucesso" });
+    } catch (error) {
+        console.error("Erro ao atualizar sala fixa:", error);
+        res.status(500).json({ error: "Erro ao atualizar sala fixa" });
+    }
+};
+
+module.exports = {
+    addFixedClass,
+    getFixedClasses,
+    deleteFixedClass,
+    updateFixedClass
+};
