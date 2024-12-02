@@ -7,16 +7,9 @@ const {
     updateFixedClass
 } = require("../controllers/salafixa.controllers.js");
 
-// Rota para adicionar uma sala fixa (associando um ambiente a um usuário)
-router.post("/", addFixedClass);
-
-// Rota para buscar as salas fixas de um usuário específico (por NIF)
-router.get("/:usuario_id", getFixedClasses);
-
-// Rota para deletar uma sala fixa (por ID)
-router.delete("/:id", deleteFixedClass);
-
-// Rota para atualizar uma sala fixa (por ID)
-router.put("/:id", updateFixedClass);
-
+// Rotas para salas fixas
+router.post('/salas-fixas', addFixedClass);               // Adicionar uma sala fixa
+router.get('/salas_fixas/:usuario_id', getFixedClasses);      // Obter salas fixas de um usuário
+router.delete('/salas-fixas/:id', deleteFixedClass);           // Deletar uma sala fixa
+router.put('/salas-fixas/:id', updateFixedClass);              // Atualizar uma sala fixa
 module.exports = router;

@@ -1,10 +1,12 @@
-const pool = require("../config/dbconfig");
+const pool = require('../config/dbconfig');  // Configuração do banco de dados
+
+// Adicionar uma sala fixa
 const addFixedClass = async (req, res) => {
     const { ambiente_id, usuario_id } = req.body;
 
-    // Verificar se o ambiente já está fixado pelo usuário
-    const checkQuery = "SELECT * FROM salas_fixas WHERE ambiente_id = $1 AND usuario_id = $2";
     try {
+        // Verificar se o ambiente já está fixado pelo usuário
+        const checkQuery = "SELECT * FROM salas_fixas WHERE ambiente_id = $1 AND usuario_id = $2";
         const checkResult = await pool.query(checkQuery, [ambiente_id, usuario_id]);
 
         if (checkResult.rows.length > 0) {
@@ -13,16 +15,16 @@ const addFixedClass = async (req, res) => {
 
         // Inserir o novo registro de sala fixa
         const query = "INSERT INTO salas_fixas (ambiente_id, usuario_id) VALUES ($1, $2)";
-        const values = [ambiente_id, usuario_id];
-        await pool.query(query, values);
-        res.status(200).json({ message: "Sala fixa anexada com sucesso" });
+        await pool.query(query, [ambiente_id, usuario_id]);
+
+        return res.status(200).json({ message: "Sala fixa anexada com sucesso" });
     } catch (error) {
         console.error("Erro ao adicionar sala fixa:", error);
-        res.status(500).json({ error: "Erro ao associar sala fixa" });
+        return res.status(500).json({ error: "Erro ao associar sala fixa" });
     }
 };
 
-
+// Obter salas fixas de um usuário
 const getFixedClasses = async (req, res) => {
     const { usuario_id } = req.params;
 
@@ -41,7 +43,7 @@ const getFixedClasses = async (req, res) => {
     }
 };
 
-
+// Excluir uma sala fixa
 const deleteFixedClass = async (req, res) => {
     const { id } = req.params;
 
@@ -60,8 +62,7 @@ const deleteFixedClass = async (req, res) => {
     }
 };
 
-
-// Função para atualizar uma sala fixa
+// Atualizar uma sala fixa
 const updateFixedClass = async (req, res) => {
     const { id } = req.params;
     const { ambiente_id, usuario_id } = req.body;

@@ -60,16 +60,17 @@ async function postAmbientes(req, res) {
 }
 
 async function getAmbientes(req, res) {
-    const query = 'SELECT * FROM ambientes';
-
+    console.log('Iniciando consulta de ambientes...');
     try {
-        const result = await pool.query(query);
+        const result = await pool.query("SELECT * FROM ambientes");
+       
         res.status(200).json(result.rows);
     } catch (error) {
-        console.error(error);
+        console.error('Erro ao buscar ambientes:', error.message);
         res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
     }
 }
+
 
 // Função para deletar usuários
 // Função para deletar ambientes
@@ -87,7 +88,6 @@ async function deleteAmbientes(req, res) {
         res.status(500).send('Erro ao excluir ambiente');
     }
 };
-
 
 // Função para editar usuários
 async function updateAmbiente(req, res) {
@@ -165,6 +165,9 @@ async function updateAmbiente(req, res) {
 
 
 async function getAmbienteByParam(req, res) {
+
+    console.log('passou aquiiiiafsdfasdfasdfasdfiiiii');
+
     try {
         const { param } = req.params;
         let query, values;
@@ -209,4 +212,4 @@ async function deletarImagensSemAmbiente(req, res) {
     res.status(200).json({ message: 'Imagens deletadas com sucesso' });
 }
 
-module.exports = { postAmbientes, getAmbientes, deleteAmbientes, updateAmbiente, getAmbienteByParam, upload, deletarImagensSemAmbiente };
+module.exports = { postAmbientes, getAmbientes, deleteAmbientes, updateAmbiente, getAmbienteByParam, upload, deletarImagensSemAmbiente};

@@ -5,7 +5,7 @@ const cors = require('cors');
 const usuariosRoute = require('./routes/usuarios.routes');
 /* const emailRoutes = require('./routes/email.routes.js'); */
 const categoriasRoute = require('./routes/categorias.routes');
-const salasFixasRoute = require('./routes/salasFixas.routes')
+const salafixaRoute = require('./routes/salasFixas.routes')
 const historicoRoute = require('./routes/historico.routes')
 const chavesRoute = require('./routes/chaves.routes')
 const ambientesRoute = require('./routes/ambientes.routes')
@@ -32,7 +32,7 @@ app.use('/uploads', (req, res, next) => {
 
 app.use('/', usuariosRoute);
 app.use('/', categoriasRoute);
-app.use('/', salasFixasRoute);
+app.use('/', salafixaRoute)
 app.use('/', historicoRoute);
 app.use('/', chavesRoute);
 app.use('/', ambientesRoute);
