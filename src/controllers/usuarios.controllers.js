@@ -10,12 +10,12 @@ async function postUsuario(req, res) {
     const { nif, nome, descriptor, notificacao, notiwhere, telefone, email, adm } = req.body;
     const image = req.file;
 
-    if(!nif) {
-        res.status(401).json({message : 'O NIF precisa ser um valor real e valido!'});
+    if (!nif) {
+        res.status(401).json({ message: 'O NIF precisa ser um valor real e valido!' });
     }
 
-    if(!descriptor) {
-        res.status(401).json({message : 'Usuario sem descrição facial, mande outra imagem!'});
+    if (!descriptor) {
+        res.status(401).json({ message: 'Usuario sem descrição facial, mande outra imagem!' });
     }
 
     // Verifica se a imagem foi enviada
@@ -37,7 +37,7 @@ async function postUsuario(req, res) {
         return res.status(500).json({ message: 'Erro ao mover a imagem', error: err.message });
     }
 
-    imageURL = `/uploads/funcionarios/${encodeURIComponent(nome)}/${image.originalname}` 
+    imageURL = `/uploads/funcionarios/${encodeURIComponent(nome)}/${image.originalname}`
 
     // Adiciona o usuário ao banco de dados
     const query = `
@@ -102,10 +102,12 @@ async function getUsuarios(req, res) {
             console.error('Erro ao buscar usuario', error);
             res.status(500).send('Erro ao buscar usuario');
         }
+
     }
     
+
 //delete usuarios
-async function deleteUsuario (req, res) {
+async function deleteUsuario(req, res) {
     try {
         const { nif } = req.params;
         await pool.query('DELETE FROM usuarios WHERE nif = $1', [nif]);
@@ -175,23 +177,23 @@ async function editUsuarios(req, res) {
 }
 
 async function userLogin(req, res) {
-    const {email, nif} = req.body;
+    const { email, nif } = req.body;
 
     if (!email || !nif) {
-        res.status(401).json({message : 'O email e o nif precisam ser preenchidos!'});
+        res.status(401).json({ message: 'O email e o nif precisam ser preenchidos!' });
     }
 
     const query = 'SELECT * FROM usuarios WHERE email = $1 AND nif = $2';
-    
+
     try {
         const result = await pool.query(query, [email, nif]);
         if (result.rows.length === 0) {
-            res.status(401).json({message : 'Usuario não encontrado!'});
+            res.status(401).json({ message: 'Usuario não encontrado!' });
         } else {
-            if(result.rows[0].email === email && result.rows[0].nif === nif) {
+            if (result.rows[0].email === email && result.rows[0].nif === nif) {
                 res.status(200).json(result.rows);
             } else {
-                res.status(401).json({message : 'Usuario não encontrado!'});
+                res.status(401).json({ message: 'Usuario não encontrado!' });
             }
         }
     } catch (error) {
@@ -228,5 +230,45 @@ async function deletarImagensSemUsuario(req, res) {
         res.status(500).json({ message: 'Erro ao deletar pastas sem usuário associado', error: error.message });
     }
 }
+async function atualizarNotificacoes(req, res) {
+    const { nif } = req.params;
+    const { notificacao, notiwhere } = req.body;
 
-module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuarioByParam, userLogin, deletarImagensSemUsuario };
+    console.log('Atualizando notificações para o NIF:', nif);  // Log para depuração
+
+    // Verificações para garantir que os campos foram enviados corretamente
+    if (notificacao == undefined || !notiwhere) {
+        return res.status(400).json({ message: 'Os campos notificacao e notiwhere são obrigatórios.' });
+    }
+
+    const validOptions = ['whatsapp', 'email', 'ambos', 'nenhum'];
+    if (!validOptions.includes(notiwhere)) {
+        return res.status(400).json({ message: 'O campo notiwhere deve ser "whatsapp", "email", "ambos" e "nenhum".' });
+    }
+
+    // Atualizando as preferências no banco de dados
+    const query = `
+        UPDATE usuarios 
+        SET notificacao = $1, notiwhere = $2 
+        WHERE nif = $3
+        RETURNING *;
+    `;
+    const values = [notificacao, notiwhere, nif];
+
+    try {
+        const result = await pool.query(query, values);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+
+        // Retorna uma resposta de sucesso com o usuário atualizado
+        res.status(200).json({ message: 'Preferências de notificações atualizadas com sucesso.', usuario: result.rows[0] });
+    } catch (error) {
+        console.error('Erro ao atualizar notificações:', error);
+        res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+    }
+}
+
+
+module.exports = { postUsuario, getUsuarios, upload, deleteUsuario, editUsuarios, getUsuarioByParam, userLogin, deletarImagensSemUsuario, atualizarNotificacoes };
+
