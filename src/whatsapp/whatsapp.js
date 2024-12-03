@@ -13,19 +13,26 @@ app.use(bodyParser.json());
 
 // Função para obter todos os nomes, números de telefone e status de notificação dos usuários
 async function getContatos() {
-    const query = 'SELECT nome, telefone, notificacao FROM usuarios';  // Consulta SQL para obter os dados dos usuários
+    const query = `
+        SELECT u.nome AS usuario_nome, u.telefone, u.notificacao, a.nome AS ambiente_nome
+        FROM usuarios u
+        JOIN historico h ON u.nif = h.funcionario
+        JOIN ambientes a ON h.ambiente = a.numero_ambiente
+        WHERE h.deleted = FALSE AND h.data_fim IS NULL;
+    `;
+
 
     try {
-        const result = await db.query(query);  // Executa a consulta no banco de dados
-        // Mapeia os resultados, formata o nome (pega apenas o primeiro nome) e o telefone
+        const result = await db.query(query); // Executa a consulta no banco de dados
         return result.rows.map(row => ({
-            nome: row.nome.split(' ')[0],  // Pega o primeiro nome do usuário
-            telefone: formatPhone(row.telefone),  // Formata o número de telefone
-            notificacao: row.notificacao  // Verifica se o usuário tem a notificação ativada
-        }));        
+            nome: row.usuario_nome.split(' ')[0], // Pega o primeiro nome do usuário
+            telefone: formatPhone(row.telefone), // Formata o número de telefone
+            notificacao: row.notificacao, // Verifica se o usuário tem a notificação ativada
+            ambiente: row.ambiente_nome // Nome do ambiente relacionado ao usuário
+        }));
     } catch (error) {
-        console.error('Erro ao buscar contatos:', error);  // Caso ocorra um erro ao buscar os contatos
-        return [];  // Retorna um array vazio em caso de erro
+        console.error('Erro ao buscar contatos:', error); // Caso ocorra um erro
+        return []; // Retorna um array vazio em caso de erro
     }
 }
 
@@ -58,37 +65,33 @@ app.post('/send-message', async (req, res) => {
         res.status(500).json({ error: 'Erro interno ao processar a requisição' });  // Retorna erro 500 se falhar
     }
 });
+cron.schedule('19 13 * * 1-5', async () => {  // Agendamento de segunda a sexta-feira
+    const contatos = await getContatos();  // Obtém a lista de contatos com reservas
 
-// Agendamento de tarefa usando o cron para enviar mensagens automaticamente
-cron.schedule('15 17 * * 1-5', async () => {  // Tarefa agendada para rodar de segunda a sexta-feira, às 20:49
-    const contatos = await getContatos();  // Obtém a lista de contatos
-
-    if (contatos.length === 0) {  // Verifica se não há contatos
-        if (!contatos.length) return console.log('Nenhum contato encontrado.');  // Loga que não há contatos
+    if (contatos.length === 0) {
+        console.log('Nenhuma reserva encontrada.');
         return;
     }
-    
 
-    // Envia mensagem para cada contato que tenha a notificação ativada
     for (const contato of contatos) {
-        const { nome, telefone, notificacao } = contato;
-        const message = `Olá ${nome}, isso é um teste, desconsidere esta mensagem!`;  // Mensagem a ser enviada
+        const { nome, telefone, notificacao, ambiente } = contato;
+        const message = `Olá ${nome}, não se esqueça de devolver a chave do ambiente: ${ambiente}!`;
 
-        if (notificacao) {  // Se o usuário tiver a notificação ativada
+        if (notificacao) {
             try {
-                // Envia a mensagem via API para o número formatado
                 await axios.post('http://localhost:3000/api/sendText', {
-                    chatId: `${telefone}@c.us`,  // Formata o número do telefone
-                    text: message,  // Mensagem a ser enviada
-                    session: 'default',  // Identificador da sessão
+                    chatId: `${telefone}@c.us`,
+                    text: message,
+                    session: 'default',
                 });
-                console.log(`Mensagem enviada para ${nome} (${telefone}): ${message}`);  // Loga o sucesso do envio
+                console.log(`Mensagem enviada para ${nome} (${telefone}): ${message}`);
             } catch (error) {
-                console.error(`Erro ao enviar mensagem para ${nome} (${telefone}):`, error);  // Loga qualquer erro ao enviar a mensagem
+                console.error(`Erro ao enviar mensagem para ${nome} (${telefone}):`, error);
             }
         }
     }
 });
+
 
 // Inicia o servidor na porta definida e loga uma mensagem de sucesso
 app.listen(PORT, () => {
